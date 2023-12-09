@@ -1,0 +1,144 @@
+document.addEventListener('DOMContentLoaded', function () {
+  console.clear();
+
+  Splitting({ target: '.planet-title h1', by: 'chars' });
+
+  const elApp = document.querySelector('#app');
+
+  const btnEarth = document.querySelector('.btn-earth');
+  btnEarth.addEventListener('click', () => redirectToPage('../earth/earth.html'));
+
+  const btnSaturn = document.querySelector('.btn-saturn');
+  btnSaturn.addEventListener('click', () => redirectToPage('../Titan/titan.html'));
+
+  const elPlanets = Array.from(document.querySelectorAll('[data-planet]')).
+    reduce((acc, el) => {
+      const planet = el.dataset.planet;
+      acc[planet] = el;
+      return acc;
+    }, {});
+
+  const planetKeys = Object.keys(elPlanets);
+
+  function getDetails(planet) {
+    const details = Array.from(elPlanets[planet].
+      querySelectorAll(`[data-detail]`)).
+      reduce((acc, el) => {
+        acc[el.dataset.detail] = el.innerHTML.trim();
+        return acc;
+      }, { planet });
+
+    return details;
+  }
+
+  let currentPlanetIndex = 0;
+  let currentPlanet = getDetails('earth');
+
+  function selectPlanet(planet) {
+    const prevPlanet = currentPlanet;
+    const elActive = document.querySelector('[data-active]');
+
+    delete elActive.dataset.active;
+
+    const elPlanet = elPlanets[planet];
+
+    elPlanet.dataset.active = true;
+    currentPlanet = getDetails(elPlanet.dataset.planet);
+
+    const elHoursDetail = elPlanet.querySelector('[data-detail="hours"]');
+    animate({
+      from: +prevPlanet.hours,
+      to: +currentPlanet.hours
+    }, value => {
+      elHoursDetail.innerHTML = Math.round(value);
+    });
+
+    const elTiltDetail = elPlanet.querySelector('[data-detail="tilt"]');
+    animate({
+      from: +prevPlanet.tilt,
+      to: +currentPlanet.tilt
+    }, value => {
+      elTiltDetail.innerHTML = value.toFixed(2);
+    });
+
+    const elGravityDetail = elPlanet.querySelector('[data-detail="gravity"]');
+    animate({
+      from: +prevPlanet.gravity,
+      to: +currentPlanet.gravity
+    }, value => {
+      elGravityDetail.innerHTML = value.toFixed(1);
+    });
+  }
+
+  function selectPlanetByIndex(i) {
+    currentPlanetIndex = i;
+    elApp.style.setProperty('--active', i);
+    selectPlanet(planetKeys[i]);
+  }
+
+  document.body.addEventListener('click', () => {
+    currentPlanetIndex = (currentPlanetIndex + 1) % planetKeys.length;
+    selectPlanetByIndex(currentPlanetIndex);
+  });
+
+  function animate(options, fn) {
+    const {
+      from,
+      to,
+      easing,
+      duration
+    } = { from: 0, to: 1, easing: progress => progress, duration: 1000, ...options };
+
+    const delta = +to - +from;
+
+    return animateFn(duration, progress => fn(from + easing(progress) * delta));
+  }
+
+  function animateFn(duration, fn) {
+    const start = performance.now();
+    const ticks = Math.ceil(duration / 16.666667);
+    let progress = 0;
+
+    function tick(now) {
+      if (progress >= 1) {
+        fn(1);
+        return;
+      }
+
+      const elapsed = now - start;
+      progress = elapsed / duration;
+      fn(progress);
+
+      requestAnimationFrame(tick);
+    }
+
+    tick(start);
+  }
+
+  const svgNS = 'http://www.w3.org/2000/svg';
+  const elSvgNav = document.querySelector('.planet-nav svg');
+  const elTspans = [...document.querySelectorAll('tspan')];
+  const length = elTspans.length - 1;
+
+  elSvgNav.style.setProperty('--length', length);
+
+  const elNavPath = document.querySelector('#navPath');
+  const elLastTspan = elTspans[length];
+  const navPathLength = elNavPath.getTotalLength() - elLastTspan.getComputedTextLength();
+
+  elTspans.forEach((tspan, i) => {
+    let percent = i / length;
+
+    tspan.setAttribute('x', percent * navPathLength);
+    tspan.setAttributeNS(svgNS, 'x', percent * navPathLength);
+
+    tspan.addEventListener('click', e => {
+      e.preventDefault();
+      selectPlanetByIndex(i);
+    });
+  });
+
+  function redirectToPage(pageUrl) {
+    window.location.href = pageUrl;
+  }
+});

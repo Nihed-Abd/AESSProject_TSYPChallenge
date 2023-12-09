@@ -1,0 +1,2 @@
+Titan/rover/aesschallenge.obj filter=lfs diff=lfs merge=lfs -text
+aesschallenge.obj filter=lfs diff=lfs merge=lfs -text

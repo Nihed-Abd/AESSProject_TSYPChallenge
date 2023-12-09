@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>TITAN</title>
+  <meta name="viewport" content="width=device-width" , initial-scale=1.0 />
+  <link rel="stylesheet" href="./style.css">
+  <link rel="icon" type="image/png" href="./img/logoSB-removebg-preview.png">
+
+  <script src="https://cdn.jsdelivr.net/npm/typeit@7"></script>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
+
+    #button-container {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      display: flex;
+      flex-direction: column;
+      z-index: 1;
+    }
+
+    .css-button {
+      margin-bottom: 10px;
+    }
+
+    #marsloc {
+      cursor: -webkit-grab;
+      cursor: grab;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+
+ 
+  </style>
+</head>
+<body>
+  <div class="stars"></div>
+
+  <div id="marsloc"></div>
+  <article id="marsinfo">
+    <h1>TITAN</h1>
+  </article>
+  <div id="button-container">
+    <div class="css-button" onclick="showAboutText()">
+      <p class="css-button-text">ABOUT</p>
+      <div class="css-button-inner">
+        <div class="reset-skew">
+          <p class="css-button-inner-text">ABOUT</p>
+        </div>
+      </div>
+    </div>
+    <div class="css-button" onclick="window.location.href='./rover/rover.html';">
+      <p class="css-button-text">ROVER</p>
+      <div class="css-button-inner">
+        <div class="reset-skew">
+          <p class="css-button-inner-text">ROVER</p>
+        </div>
+      </div>
+    </div>
+    <div class="css-button" onclick="window.location.href='../index.html';">
+      <p class="css-button-text">BACK</p>
+      <div class="css-button-inner">
+        <div class="reset-skew">
+          <p class="css-button-inner-text">BACK</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="about-text">
+  </div>
+  <script>
+    function showAboutText() {
+      var aboutText = document.getElementById("about-text");
+      aboutText.style.display = "block";
+  
+      setTimeout(function () {
+        aboutText.style.display = "none";
+      }, 15000);
+    }
+  
+    document.addEventListener("DOMContentLoaded", function () {
+      new TypeIt("#about-text", {
+        speed: 50,
+        startDelay: 900,
+      })
+        .type("Titan, Saturn's captivating moon, reveals an otherworldly spectacle.", { delay: 100 })
+        .move(null, { to: "END" })
+        .type("<br/>Draped in an orange haze,", { delay: 100 })
+        .move(null, { to: "END" })
+        .type("<br/> it showcases landscapes adorned with liquid methane lakes.", { delay: 100 })
+        .move(null, { to: "END" })
+        .type("<br/>A celestial invitation to uncover the mysteries beneath its celestial veil.", { delay: 400 })
+        .move(null, { to: "END" })
+        .type("<br/>as a world of extremes and mysteries.", { delay: 400 })
+        .go();
+    });
+  </script>
+  
+  <style>
+    #about-text {
+      display: none;
+      position: absolute;
+      top: 50%; 
+      left: 50%; 
+      transform: translate(-50%, -50%);
+      background: url('path/to/about-text.png') no-repeat center center;
+      width: 80%;
+      max-width: 500px; 
+      height: auto; 
+      z-index: 2;
+      color: rgb(0, 0, 0);
+      font-size: 20px; 
+      font-weight: bold; 
+      text-shadow: 2px 2px 5px rgba(70, 65, 65, 0.7); 
+      white-space: pre-line; 
+      text-align: center; 
+    }
+  </style>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/three.js/r83/three.js'></script>
+  <script src='https://s3-us-west-2.amazonaws.com/s.cdpn.io/123941/orbitcontrols.js'></script>
+  <script src="script.js"></script>
+</body>
+</html>

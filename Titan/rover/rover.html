@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="../../img//logoSB-removebg-preview.png">
+    <title>TITAN ROVER</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: "Montserrat", sans-serif;
+            background-color: #000;
+            overflow: hidden;
+        }
+
+        #container3D canvas {
+            width: 100vw !important;
+            height: 100vh !important;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .container {
+            position: relative;
+            top: 35px;
+            right: 100px;
+            z-index: 1;
+            height: 100%;
+            display: flex;
+            align-items: center;
+        }
+
+        a {
+            display: block;
+            margin: auto;
+            padding: 1rem 1.25rem;
+            font-family: sans-serif;
+            font-size: 1.5rem;
+            text-decoration: none;
+            text-shadow:
+                -2px 4px 4px #091243,
+                0 0 10px #00D0FF,
+                inset 1px 1px 1px white;
+            color: #1FFFFF;
+            border: 2px solid;
+            border-radius: 4px;
+            background-color: transparent;
+            box-shadow:
+                0 1px 2px rgba(0, 0, 0, 0.6),
+                2px 1px 4px rgba(0, 0, 0, 0.3),
+                2px 4px 3px rgba(3, 0, 128, 0.3),
+                0 0 7px 2px rgba(0, 208, 255, 0.6),
+                inset 0 1px 2px rgba(0, 0, 0, 0.6),
+                inset 2px 1px 4px rgba(0, 0, 0, 0.3),
+                inset 2px 4px 3px rgba(3, 0, 128, 0.3),
+                inset 0 0 7px 2px rgba(0, 208, 255, 0.6);
+            animation: flickering 5s infinite;
+        }
+
+        .loading-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+            display: none;
+        }
+
+        .loading-icon {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes flickering {
+            0% {
+                border-color: transparent;
+                opacity: 0.2;
+            }
+
+            2% {
+                border-color: #1FFFFF;
+                opacity: 1;
+            }
+
+            4% {
+                border-color: transparent;
+                opacity: 0.2;
+            }
+
+            8% {
+                border-color: #1FFFFF;
+                opacity: 1;
+            }
+
+            28% {
+                border-color: #1FFFFF;
+                opacity: 1;
+            }
+
+            30% {
+                border-color: transparent;
+                opacity: 0.2;
+            }
+
+            36% {
+                border-color: #1FFFFF;
+                opacity: 1;
+            }
+
+            100% {
+                border-color: #1FFFFF;
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-container" id="loadingContainer">
+        <div class="loading-icon"></div>
+    </div>
+    <div class="container">
+        <a href="../titan.html">BACK</a>
+    </div>
+    <script type="module">
+        import * as THREE from "https://cdn.skypack.dev/three@0.129.0/build/three.module.js";
+        import { OrbitControls } from "https://cdn.skypack.dev/three@0.129.0/examples/jsm/controls/OrbitControls.js";
+        import { OBJLoader } from "https://cdn.skypack.dev/three@0.129.0/examples/jsm/loaders/OBJLoader.js";
+
+        const loadingContainer = document.getElementById('loadingContainer');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
+        let mouseX = window.innerWidth / 2;
+        let mouseY = window.innerHeight / 2;
+        let object;
+        let controls;
+        let isMousePressed = false;
+        const modelPath = './aesschallenge.obj';
+        const loader = new OBJLoader();
+
+        // Initialize the animate function
+        function animate() {
+            requestAnimationFrame(animate);
+
+            if (isMousePressed && object) {
+                object.rotation.y = -3 + mouseX / window.innerWidth * 3;
+                object.rotation.x = -1.2 + mouseY * 2.5 / window.innerHeight;
+            }
+
+            controls.update();
+
+            // Check if control is changed, if not, stop the rotation
+            if (!isMousePressed && isControlChanged) {
+                isControlChanged = false;
+                controls.update();
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        // Add star field
+        function createStars() {
+            const starsGeometry = new THREE.BufferGeometry();
+            const starsMaterial = new THREE.PointsMaterial({ color: 0xFFFFFF, size: 0.1 });
+
+            const starsVertices = [];
+
+            for (let i = 0; i < 1000; i++) {
+                const x = (Math.random() - 0.5) * 2000;
+                const y = (Math.random() - 0.5) * 2000;
+                const z = (Math.random() - 0.5) * 2000;
+
+                starsVertices.push(x, y, z);
+            }
+
+            starsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starsVertices, 3));
+
+            const stars = new THREE.Points(starsGeometry, starsMaterial);
+            scene.add(stars);
+        }
+
+        // Start loading the object
+        loader.load(
+    modelPath,
+    function (obj) {
+        object = obj;
+        scene.add(object);
+
+        const box = new THREE.Box3().setFromObject(obj);
+        const size = box.getSize(new THREE.Vector3());
+        const center = box.getCenter(new THREE.Vector3());
+        const maxSize = Math.max(size.x, size.y, size.z);
+        const fitHeightDistance = maxSize / (2 * Math.atan(Math.PI * camera.fov / 360));
+        const fitWidthDistance = fitHeightDistance / camera.aspect;
+        const distance = Math.max(fitHeightDistance, fitWidthDistance);
+        const target = center;
+
+        camera.position.copy(target).add(new THREE.Vector3(0, 0, distance));
+        camera.lookAt(target);
+
+        // Hide loading icon after loading
+        loadingContainer.style.display = 'none'; // Reset it to 'none'
+
+        // Start the animation loop after the object is loaded
+        animate();
+    },
+    function (xhr) {
+        // Show loading icon during loading
+        loadingContainer.style.display = 'block';
+
+        console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+    },
+    function (error) {
+        console.error(error);
+
+        // Ensure loading icon is hidden in case of an error
+        loadingContainer.style.display = 'none';
+    }
+);
+
+        const renderer = new THREE.WebGLRenderer({ alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        camera.far = 2000;
+
+        const topLight = new THREE.DirectionalLight(0xffffff, 1);
+        topLight.position.set(500, 500, 500);
+        topLight.castShadow = true;
+        scene.add(topLight);
+
+        const ambientLight = new THREE.AmbientLight(0x333333, 1);
+        scene.add(ambientLight);
+
+        controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.25;
+        controls.screenSpacePanning = false;
+        controls.enabled = false;
+
+        // Set maximum polar angle for mobile devices
+        controls.maxPolarAngle = Math.PI / 2;
+
+        let isControlChanged = false;
+
+        controls.addEventListener('change', function () {
+            isControlChanged = true;
+        });
+
+        // Create stars
+        createStars();
+
+        window.addEventListener("resize", function () {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        document.addEventListener("mousemove", (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
+        document.addEventListener("mousedown", () => {
+            isMousePressed = true;
+            controls.enabled = true;
+        });
+
+        document.addEventListener("mouseup", () => {
+            isMousePressed = false;
+            controls.enabled = false;
+        });
+
+        document.addEventListener("wheel", (e) => {
+            controls.dolly(e.deltaY > 0 ? -0.1 : 0.1);
+        });
+
+        let touchStartX, touchStartY;
+
+        document.addEventListener("touchstart", (e) => {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+            isMousePressed = true;
+            controls.enabled = true;
+        });
+
+        document.addEventListener("touchmove", (e) => {
+            mouseX = e.touches[0].clientX - touchStartX;
+            mouseY = e.touches[0].clientY - touchStartY;
+        });
+
+        document.addEventListener("touchend", () => {
+            isMousePressed = false;
+            controls.enabled = false;
+        });
+    </script>
+</body>
+</html>

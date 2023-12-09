@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Trip Menu</title>
+  <link rel="icon" type="image/png" href="../img/logoSB-removebg-preview.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+  <link rel='stylesheet' href='https://unpkg.com/splitting@1.0.6/dist/splitting.css'>
+  <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="./titan.css">
+
+  <style>
+    .custom-btn {
+      position: relative;
+      top: 50px;
+      left: 70px;
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: transparent;
+      color: #ffffff;
+      border: 1px solid #ffffff;
+      font-size: 16px;
+      cursor: pointer;
+      overflow: hidden;
+      z-index: 999;
+    }
+
+    .custom-btn:before,
+    .custom-btn:after {
+      pointer-events: none;
+      content: '';
+      position: absolute;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: #0e2571;
+      z-index: -1;
+    }
+
+    .custom-btn:before {
+      left: 100%;
+    }
+
+    .custom-btn:after {
+      left: -100%;
+    }
+
+    .custom-btn:hover:before,
+    .custom-btn:hover:after,
+    .custom-btn:active:before,
+    .custom-btn:active:after {
+      left: 0;
+    }
+
+    #tapToScroll {
+      position: relative;
+      top: 30%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 999;
+      text-align: center;
+      width: 100%;
+    }
+
+    .neon-text {
+      font-family: 'Arial', sans-serif;
+      font-size: 28px;
+      color: #ffffff; /* Neon white color */
+      text-shadow: 0 0 20px #ffffff, 0 0 40px #ffffff, 0 0 60px #ffffff;
+      animation: neon-flicker 1.5s infinite alternate;
+    }
+
+    @keyframes neon-flicker {
+      0%, 100% {
+        text-shadow: 0 0 10px #ffffff, 0 0 20px #ffffff, 0 0 30px #ffffff;
+      }
+      50% {
+        text-shadow: 0 0 20px #ffffff, 0 0 40px #ffffff, 0 0 60px #ffffff;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="tapToScroll">
+    <p class="neon-text">Tap To Scroll</p>
+  </div>
+  <div id="app" data-current-planet="earth">
+    <nav class="planet-nav">
+      <svg viewBox="0 20 400 400" xmlns="http://www.w3.org/2000/svg">
+        <path id="navPath" d="M10,200 C30,-28 370,-28 390,200" fill="none" />
+        <text>
+          <textPath href="#navPath" startOffset="2%" font-size="15" textLength="100%" lengthAdjust="spacingAndGlyphs">
+          </textPath>
+        </text>
+      </svg>
+    </nav>
+
+    <!-- Earth Card -->
+    <div class="planet" data-planet="earth" data-active>
+      <div class="planet-title">
+        <h1>Earth</h1>
+        <p class="planet-description">"Earth: A Symphony of Life, Where Nature and Harmony Unite."</p>
+        <button class="custom-btn btn-2 btn-earth" onclick="redirectToPage('../../earth/index.html')">Visit Earth</button>
+      </div>
+
+      <div class="planet-details">
+        <div class="detail" data-detail="tilt" data-postfix="°">
+          5.13
+        </div>
+        <div class="detail" data-detail="gravity" data-postfix="𝗑">
+          7.3
+        </div>
+        <div class="detail" data-detail="hours">
+          30
+        </div>
+      </div>
+
+      <figure class="planet-figure">
+        <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/t-1188/3_earth.jpg" alt="Earth" />
+      </figure>
+    </div>
+
+    <!-- Saturn Card with Titan -->
+    <div class="planet" data-planet="saturn" data-active>
+      <div class="planet-title">
+        <h1>Saturn</h1>
+        <p class="planet-description">"Saturn: Jewel of the Cosmos, Adorned with Rings, a Celestial Majesty."</p>
+        <p class="planet-description">
+          "Titan: Mystical Moon of Saturn, Shrouded in Secrets, Where Science Meets the Unknown.".
+        </p>
+        <button class="custom-btn btn-2 btn-saturn" onclick="redirectToPage('../../Titan/titan.html')">Visit Titan</button>
+      </div>
+      <div class="planet-details">
+        <div class="detail" data-detail="tilt" data-postfix="°">
+          9.13
+        </div>
+        <div class="detail" data-detail="gravity" data-postfix="𝗑">
+          7.3
+        </div>
+        <div class="detail" data-detail="hours">
+          60
+        </div>
+      </div>
+      <figure class="planet-figure">
+        <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/t-1188/6_saturn.jpg" alt="Saturn" />
+      </figure>
+
+      <!-- Titan Card -->
+      <article class="card card--earth">
+        <div class="card__planet">
+          <div class="planet__atmosphere">
+            <div class="planet__surface"></div>
+          </div>
+        </div>
+        <div class="card__info">
+          <h2 class="info__title">Titan</h2>
+          <div class="info__form">
+            <div class="info__item">
+              <label class="info__label">Tilt</label><span class="info__line"></span><i class=" tilt__icon fas fa-long-arrow-alt-right"></i><span class="info__detail">23.26°      </span>
+            </div>
+            <div class="info__item">
+              <label class="info__label">Day</label><span class="info__line"></span><span class="info__detail">23.9 hours</span>
+            </div>
+            <div class="info__item">
+              <label class="info__label">Year</label><span class="info__line"></span><span class="info__detail">365.2 days</span>
+            </div>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+
+  <script src='https://unpkg.com/splitting@1.0.6/dist/splitting.min.js'></script>
+  <script src="./script.js"></script>
+
+</body>
+</html>
